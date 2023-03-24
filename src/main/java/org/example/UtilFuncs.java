@@ -32,8 +32,8 @@ public class UtilFuncs {
      * @param d   : days of cdr.
      * @param h   : hours of cdr.
      * @param m   : minutes of cdr.
-     * @param s   :  minutes of cdr.
-     * @return : DD:hh:mm:ss in seconds format.
+     * @param s   : minutes of cdr.
+     * @return    : DD:hh:mm:ss in seconds format.
      */
     public static long inSeconds(int[] arr, int d, int h, int m, int s) {
         return arr[d] * 24L * 3600L + arr[h] * 3600L + arr[m] * 60L + arr[s];

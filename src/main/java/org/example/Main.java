@@ -18,8 +18,10 @@ public class Main {
         numbers.addAll(set);
 
         String[] incomingData = incomingDataList.toArray(new String[0]);
-        CDRs cdrs = new CDRs(incomingData);
-
+        //CDRs cdrs = new CDRs(incomingData);
+/**
+ * прописать if для команд
+ * */
         //uncomment to get report for all numbers/for 1 certain number
         //printAllReport(cdrs, numbers, reportRootPath);
 

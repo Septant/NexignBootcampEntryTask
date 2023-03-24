@@ -2,9 +2,15 @@ package org.example;
 
 import static java.lang.Integer.parseInt;
 import static java.lang.Long.parseLong;
-import static java.lang.String.format;
 import static org.example.UtilFuncs.*;
 
+
+/**
+ * Call data record is used to store information about a call
+ * including its start&end, duration, tariff plan, type of call and cost.
+ * Uses info from {@link Tariff} to initialize tariff field.
+ * Getters for fields are provided.
+ */
 public class CDR {
     private final long agentNumber;
     private final String callType;
@@ -12,9 +18,17 @@ public class CDR {
     private final int[] callEnd = new int[6];
     private final int[] callDuration;
     private final Tariff tariff;
-
     private double callCost;
 
+    /**
+     * constructor for data record
+     *
+     * @param entry : string format: "\d\d, [\d]{11}, [\d]{14}, [\d]{14}, \d\d"
+     *              <p>
+     *              Crushing entry to a group of substrings and assigns its values to class fields.
+     *              Sets up tariff and calculates call duration.
+     *              </p>
+     */
     CDR(String entry) {
         String[] partial = entry.split(", ");
         this.callType = partial[0];
@@ -63,11 +77,28 @@ public class CDR {
         return tariff;
     }
 
+    public double getCallCost() {
+        return callCost;
+    }
+
+    public void setCallCost(double callCost) {
+        this.callCost = callCost;
+    }
+
+
+    /**
+     * Calculates call duration. Able to calculate if call start and has not the same DD
+     *
+     * @param start : start array of the call size of 6.
+     * @param end   : end array of the call size of 6.
+     *
+     * @return : array size of 3: {hh, mm, ss}
+     */
     private int[] callDuration(int[] start, int[] end) {
         int[] value = new int[3];
         long stInSec = 0, edInSec = 0;
         if (start[2] == end[2]) {
-            stInSec =  inSeconds(start, 3, 4, 5);
+            stInSec = inSeconds(start, 3, 4, 5);
             edInSec = inSeconds(end, 3, 4, 5);
         } else if (start[2] != end[2]) {
             stInSec = inSeconds(start, 2, 3, 4, 5);
@@ -82,17 +113,5 @@ public class CDR {
 
         return value;
     }
-
-    public double getCallCost() {
-        return callCost;
-    }
-
-    public void setCallCost(double callCost) {
-        this.callCost = callCost;
-    }
-
-
-
-
 
 }

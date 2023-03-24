@@ -1,7 +1,7 @@
 package org.example;
 
 /**
- *  This class is showing agent's Tariff.
+ * This class is showing agent's Tariff.
  * It gets tariff type from {@link CDR} and sets up relevant settings.
  * Tariff options have getters to access
  *
