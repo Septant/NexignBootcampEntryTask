@@ -23,9 +23,9 @@ public class CDR {
         this.agentNumber = parseLong(partial[1]);
         this.callStart[0] = parseInt(partial[2].substring(0, 4));
         this.callEnd[0] = parseInt(partial[3].substring(0, 4));
-        for (int i=0;i<5;i++) {
-            this.callStart[i+1] = parseInt(partial[2].substring(4 + 2*i, 6 + 2*i));
-            this.callEnd[i+1] = parseInt(partial[3].substring(4 + 2*i, 6 + 2*i));
+        for (int i = 0; i < 5; i++) {
+            this.callStart[i + 1] = parseInt(partial[2].substring(4 + 2 * i, 6 + 2 * i));
+            this.callEnd[i + 1] = parseInt(partial[3].substring(4 + 2 * i, 6 + 2 * i));
         }
 
         this.tariff = new Tariff(parseInt(partial[4]));
@@ -68,21 +68,33 @@ public class CDR {
 
     private int[] callDuration(int[] start, int[] end) {
         int[] value = new int[3];
-        long stInSec = inSeconds(start, 3,4,5);
-        long edInSec = inSeconds(end, 3,4,5);
-        long duration = edInSec - stInSec;
+        long stInSec = 0, edInSec = 0;
+        if (start[2] == end[2]) {
+            stInSec = inSeconds(start, 3, 4, 5);
+            edInSec = inSeconds(end, 3, 4, 5);
+        } else if (start[2] != end[2]) {
+            stInSec = inSeconds(start, 2, 3, 4, 5);
+            edInSec = inSeconds(end, 2, 3, 4, 5);
+        }
 
-        value[0] = (int) Math.floor(duration/3600);
-        duration = duration - (long) value[0]*3600;
-        value[1] = (int) Math.floor(duration/60);
-        duration = duration - (long) value[1]*60;
+        long duration = edInSec - stInSec;
+        value[0] = (int) Math.floor(duration / 3600);
+        duration = duration - (long) value[0] * 3600;
+        value[1] = (int) Math.floor(duration / 60);
+        duration = duration - (long) value[1] * 60;
         value[2] = (int) duration;
+
         return value;
     }
 
-    public long inSeconds (int[] arr, int h, int m, int s) {
+    public long inSeconds(int[] arr, int h, int m, int s) {
         return arr[h] * 3600L + arr[m] * 60L + arr[s];
     }
+
+    public long inSeconds(int[] arr, int d, int h, int m, int s) {
+        return arr[d] * 24L * 3600L + arr[h] * 3600L + arr[m] * 60L + arr[s];
+    }
+
     public double getCallCost() {
         return callCost;
     }
@@ -99,7 +111,7 @@ public class CDR {
 
     public String dateFormat(int[] dateArr) {
         String temp = "";
-        if(dateArr.length == 6) {
+        if (dateArr.length == 6) {
             temp += dateArr[0];
             temp += ("-" + decFormat(dateArr[1]) + "-" + decFormat(dateArr[2]) + " ");
             temp += (decFormat(dateArr[3]) + ":" + decFormat(dateArr[4]) + ":" + decFormat(dateArr[5]));

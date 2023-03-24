@@ -32,7 +32,7 @@ public class Main {
         CDRs cdrs = new CDRs(incomingData);
 
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter the phone number to generate a report");
+        System.out.print("Enter the phone number to generate a report\n");
         long number = parseLong(scanner.nextLine());
 
         boolean flag = false;
@@ -60,7 +60,8 @@ public class Main {
                             ""+cdrs.getCallCost(cdr)+" |\n");
                 }
                 writer.write("----------------------------------------------------------------------------\n");
-                writer.write("|                                           Total Cost: |     "+filteredByNumber.getTotalCost() +"rubles   |\n");
+                writer.write("|                                           Total Cost: |" +
+                        "    "+filteredByNumber.agentBilling(filteredByNumber.cdrList) +" rubles   |\n");
                 writer.write("----------------------------------------------------------------------------");
 
                 writer.close();
