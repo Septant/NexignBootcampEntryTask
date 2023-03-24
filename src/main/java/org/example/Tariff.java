@@ -3,7 +3,7 @@ package org.example;
 public class Tariff {
     private final int tariffType;
     private int tariffPeriod;
-    private double tariffPeriodCost;
+    private double tariffCost;
     private double defaultCost;
 
 
@@ -15,12 +15,12 @@ public class Tariff {
             }
             case 06: {
                 this.tariffPeriod = 300;
-                this.tariffPeriodCost = 100;
+                this.tariffCost = 100;
                 this.defaultCost = 1;
             }
             case 11: {
                 this.tariffPeriod = 100;
-                this.tariffPeriodCost = 0.5;
+                this.tariffCost = 0.5;
                 this.defaultCost = 1.5;
             }
         }
@@ -30,8 +30,8 @@ public class Tariff {
         return defaultCost;
     }
 
-    public double getTariffPeriodCost() {
-        return tariffPeriodCost;
+    public double getTariffCost() {
+        return tariffCost;
     }
 
     public int getTariffPeriod() {

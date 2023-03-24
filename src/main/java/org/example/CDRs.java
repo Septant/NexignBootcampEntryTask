@@ -1,67 +1,67 @@
 package org.example;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 
 public class CDRs {
-    List<CDR> cdrs = new ArrayList<>();
-    private double totalCost = 0;
-    private long defaultTimer;
+    List<CDR> cdrList;
+    private double totalCost;
+    private long currentTimer;
     private long tariffTimer;
 
-    CDRs(String[] data) {
-        for (int i = 0; i < data.length; i++)
-            this.cdrs.add(i, new CDR(data[i]));
+    CDRs() {
+        cdrList = new ArrayList<>();
     }
 
-    public List<CDR> FilterByNumber(List<CDR> cdrs, int number) {
-        List<CDR> filtered = new ArrayList<>();
+    CDRs(String[] data) {
+        cdrList = new ArrayList<>();
+        for (int i = 0; i < data.length; i++) {
+            this.totalCost = 0;
+            this.cdrList.add(i, new CDR(data[i]));
+        }
+    }
 
+    public CDRs FilterByNumber(List<CDR> cdrs, long number) {
+        CDRs filtered = new CDRs();
         for (CDR cdr : cdrs)
             if (cdr.getAgentNumber() == number)
-                filtered.add(cdr);
+                filtered.cdrList.add(cdr);
         sortByCallStart(filtered);
         return filtered;
     }
 
-    public void sortByCallStart(List<CDR> cdrs) {
+    public void sortByCallStart(CDRs cdrs) {
         Comparator<CDR> comparator = Comparator.comparingLong(CDR::getCallStartLong);
-        cdrs.sort(comparator);
+        cdrs.cdrList.sort(comparator);
     }
 
     public double getCallCost(CDR cdr) {
         long secs = 0;
         secs = cdr.getCallDuration()[0] * 3600L + cdr.getCallDuration()[1] * 60L + (cdr.getCallDuration()[2]);
-        setDefaultTimer(getDefaultTimer() + secs);
 
         long trfPeriod = cdr.getTariff().getTariffPeriod();
         int tariff = cdr.getTariff().getTariffType();
         double defCost = cdr.getTariff().getDefaultCost();
-        double trfCost = cdr.getTariff().getTariffPeriodCost();
+        double trfCost = cdr.getTariff().getTariffCost();
         byte callType = cdr.getCallType();
 
         if (tariff == 03) {
-            cdr.setCallCost(Math.floor(getDefaultTimer() / 60D) * defCost);
-            setDefaultTimer(getDefaultTimer() % 60L);
+            setCurrentTimer(getCurrentTimer() + secs);
+            cdr.setCallCost(Math.floor(getCurrentTimer() / 60D) * defCost);
+            setCurrentTimer(getCurrentTimer() % 60L);
         }
         if (tariff == 06) {
+            setCurrentTimer(getCurrentTimer() + secs);
             if (getTariffTimer() <= trfPeriod * 60L) {
                 cdr.setCallCost(0);
-                while (getTariffTimer() < trfPeriod & getDefaultTimer() > 0) {
-                    long temp = trfPeriod - getDefaultTimer();
-
-                    if (getDefaultTimer() >= 60L & temp >= 60L) {
-                        setTariffTimer(getTariffTimer() + 60L);
-                        setDefaultTimer(getDefaultTimer() - 60);
-                        if (getTariffTimer() == getTariffTimer())
-                            cdr.setCallCost(cdr.getCallCost() + trfCost);
-                    } else tarificationBounds(cdr, defCost, trfCost, temp);
-                }
+                while (getTariffTimer() < trfPeriod & getCurrentTimer() > 0)
+                    callBilling(cdr, trfPeriod, tariff, defCost, trfCost);
             } else if (getTariffTimer() > trfPeriod * 60L) {
-                cdr.setCallCost(Math.floor(getDefaultTimer() / 60D) * defCost);
-                setDefaultTimer(getDefaultTimer() % 60L);
+                cdr.setCallCost(Math.floor(getCurrentTimer() / 60D) * defCost);
+                setCurrentTimer(getCurrentTimer() % 60L);
             }
         }
         if (tariff == 11) {
@@ -69,45 +69,53 @@ public class CDRs {
                 cdr.setCallCost(0);
             }
             if (getTariffTimer() <= trfPeriod * 60L && callType == 01) {
-                setTariffTimer(getTariffTimer() + secs);
-                while (getTariffTimer() <= trfPeriod & getDefaultTimer() > 0) {
-                    long temp = trfPeriod - getDefaultTimer();
-                    if (getDefaultTimer() >= 60L & temp >= 60L) {
-                        setTariffTimer(getTariffTimer() + 60L);
-                        setDefaultTimer(getDefaultTimer() - 60);
-                        cdr.setCallCost(cdr.getCallCost() + trfCost);
-
-                    } else {
-                        tarificationBounds(cdr, defCost, trfCost, temp);
-                    }
-                }
-            } else if (getTariffTimer() > trfPeriod * 60L){
-                    cdr.setCallCost(Math.floor(getDefaultTimer() / 60D) * defCost);
-                    setDefaultTimer(getDefaultTimer() % 60L);
+                setCurrentTimer(getCurrentTimer() + secs);
+                while (getTariffTimer() <= trfPeriod & getCurrentTimer() > 0)
+                    callBilling(cdr, trfPeriod, tariff, defCost, trfCost);
+            } else if (getTariffTimer() > trfPeriod * 60L) {
+                cdr.setCallCost(Math.floor(getCurrentTimer() / 60D) * defCost);
+                setCurrentTimer(getCurrentTimer() % 60L);
             }
         }
-
         return cdr.getCallCost();
     }
 
-    private void tarificationBounds(CDR cdr, double defCost, double trfCost, long temp) {
-        if (getDefaultTimer() < 60 & temp >= getDefaultTimer()) {
-            setTariffTimer(getTariffTimer() + getDefaultTimer());
-            setDefaultTimer(0);
-        } else if (getDefaultTimer() >= 60L & temp < 60) {
-            setTariffTimer(getDefaultTimer() - (getDefaultTimer() - temp));
-            setDefaultTimer(getDefaultTimer() - temp);
+    private void callBilling(CDR cdr, long trfPeriod, int tariff, double defCost, double trfCost) {
+        long temp = trfPeriod - getCurrentTimer();
+
+        if (getCurrentTimer() >= 60L & temp >= 60L) {
+            setTariffTimer(getTariffTimer() + 60L);
+            setCurrentTimer(getCurrentTimer() - 60);
+            if (tariff == 06) {
+                if (getTariffTimer() == getTariffTimer())
+                    cdr.setCallCost(cdr.getCallCost() + trfCost);
+            } else if (tariff == 11) {
+                cdr.setCallCost(cdr.getCallCost() + trfCost);
+            }
+        } else if (getCurrentTimer() < 60 & temp >= getCurrentTimer()) {
+            setTariffTimer(getTariffTimer() + getCurrentTimer());
+            setCurrentTimer(0);
+        } else if (getCurrentTimer() >= 60L & temp < 60) {
+            setTariffTimer(getCurrentTimer() - (getCurrentTimer() - temp));
+            setCurrentTimer(getCurrentTimer() - temp);
             cdr.setCallCost(cdr.getCallCost() + defCost + trfCost);
         }
     }
 
 
-    public long getDefaultTimer() {
-        return defaultTimer;
+    public double agentBilling(CDRs cdrs) {
+        for (int i = 0; i < cdrs.cdrList.size(); i++) {
+            setTotalCost(getTotalCost() + getCallCost(cdrs.cdrList.get(i)));
+        }
+        return getTotalCost();
     }
 
-    public void setDefaultTimer(long defaultTimer) {
-        this.defaultTimer = defaultTimer;
+    public long getCurrentTimer() {
+        return currentTimer;
+    }
+
+    public void setCurrentTimer(long currentTimer) {
+        this.currentTimer = currentTimer;
     }
 
     public long getTariffTimer() {
