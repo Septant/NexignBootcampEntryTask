@@ -1,35 +1,42 @@
 # NexignBootcampEntryTask
 Входное задание для Nexign bootcamp
 
-Все пояснения и документация к проекту даны на английском языке.
+Все пояснения и документация в коде к проекту даны на английском языке.
 
-## [Задание](https://github.com/NexignBootcamp/Test-for-all-data-record/blob/main/task.txt)
+## 1. [Задание](https://github.com/NexignBootcamp/Test-for-all-data-record/blob/main/task.txt)
 
-## [Пример отчета](https://github.com/NexignBootcamp/Test-for-all-data-record/blob/main/report_example.txt)
+## 2. [Пример отчета](https://github.com/NexignBootcamp/Test-for-all-data-record/blob/main/report_example.txt)
 
-## [Тестовые данные](/data.test.txt)
+## 3. [Тестовые данные](/data/test.txt)
 
-## [Отчеты](/reports)
+## 4. [Отчеты](/reports)
 
-## [Классы](src/main/java/org/application) :
- -[Main](src/main/java/org/application/Main.java):
- 
+Данная программа принимает на вход набор строк формата (см.[Тестовые данные](/data/test.txt)) и на его основе формирует [Отчеты](/reports).
+
+***Версия для Java JDK 11 (Maven).***
+
+Используйте команды mvn для старта
+Или
+javac Main.java
+java Main
+
+## 5. [Классы](src/main/java/org/application) :
+ - [Main](src/main/java/org/application/Main.java):
  Содержит инициализации вспомогательных списков, получение данных и и инициализацию списка CDR. Генерирует отчёты.
  
- -[UtilFuncs](src/main/java/org/application/UtilFuncs.java) :
+ - [UtilFuncs](src/main/java/org/application/UtilFuncs.java) :
+ Класс для вспомогательных функций использумые в других частях кода.
  
- Содержит различные вспомогательные функции использумые в классах CDR|CDRs|Main.
- 
- -[Tariff](src/main/java/org/application/Tariff.java) :
- 
+ - [Tariff](src/main/java/org/application/Tariff.java) :
  Включает в себя 3 тарифа из задания и их параметры.
  
- -[CDR](src/main/java/org/application/CDR.java) : 
+ - [CDR](src/main/java/org/application/CDR.java) : 
+  Описывает основную сущность программы - запись информации о звонке (Call Data Record). Конструируется по строке из входа. Включает в себя геттеры для полей, кастомные функции преобразования к long и рассчёта длительности звонка.
  
- Класс, описывающий основную сущность программы - запись информации о звонке (Call Data Record). Конструируется по строке заданного формата(см.[Тестовые данные](/data.test.txt)). Включает в себя геттеры для полей, кастомные функции преобразования к long и рассчёта длительности звонка.
- 
- -[CDRs](src/main/java/org/application/CDRs.java): Класс предоставляющий возможность работать со списком CDR. Имеется 2 конструктора для пустого списка и списка по получаемому массиву строк, геттеры и сеттеры для полей. 
-
-Функции:
-
-генерация отфильтрованного сортированного по дате начала звонка списка, сама сортировка, рассчёт стоимости звонка, вспомогательную функцию для неё, а также функцию рассчёта итоговой цены за рассчётный период.
+ - [CDRs](src/main/java/org/application/CDRs.java): 
+	Предоставляет возможность работать со списком состоящим из CDR. Имеется 2 конструктора для пустого списка и списка по получаемому массиву строк, геттеры и сеттеры для полей. 
+	- Функции:
+         * Сортировка списка звонков по дате их начала
+         * Фильтрация и сортировка списка звонков по заданному номер
+         * Рассчёт стоимости звонка и вспомогательная функция для работы блока привилегированной части тарифа
+         * Итоговая цена за рассчётный период.
