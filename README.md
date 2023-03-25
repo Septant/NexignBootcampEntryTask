@@ -16,8 +16,11 @@
 ***Версия для Java JDK 11 (Maven).***
 
 Используйте команды mvn для старта
-Или
+
+Или последовательность: 
+
 javac Main.java
+
 java Main
 
 ## 5. [Классы](src/main/java/org/application) :
